@@ -1,0 +1,22 @@
+/* 写CSS先把所有选择器写好 */
+
+#app2 .tab-bar {
+  /* border: 1px solid green; */
+  display: flex;
+}
+#app2 .tab-bar > li {
+  border: 1px solid black;
+  width: 50%;
+}
+#app2 .tab-bar > li.selected {
+  background: yellow;
+}
+#app2 .tab-content {
+  /* border: 1px solid pink; */
+}
+#app2 .tab-content > li {
+  display: none;
+}
+#app2 .tab-content > li.actions {
+  display: block;
+}

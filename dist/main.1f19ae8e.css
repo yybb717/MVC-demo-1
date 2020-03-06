@@ -1,0 +1,92 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+ol,
+ul {
+  list-style: none;
+}
+
+/* 干掉滚动条 */
+body {
+  overflow: hidden;
+}
+
+/* 用flex布局，他里面的元素每个模块换行 */
+body > .page {
+  display: flex;
+  flex-wrap: wrap;
+}
+body > .page > section {
+  width: 50vw;
+  height: 50vh;
+  border: 1px solid red;
+}
+
+/* 给每个都加上id才可以写选择器 */
+
+/* 写CSS先把所有选择器写好 */
+
+#app2 .tab-bar {
+  /* border: 1px solid green; */
+  display: flex;
+}
+#app2 .tab-bar > li {
+  border: 1px solid black;
+  width: 50%;
+}
+#app2 .tab-bar > li.selected {
+  background: yellow;
+}
+#app2 .tab-content {
+  /* border: 1px solid pink; */
+}
+#app2 .tab-content > li {
+  display: none;
+}
+#app2 .tab-content > li.actions {
+  display: block;
+}
+
+/* 默认是正方形 ,开始状态，里面有动画效果*/
+#app3 .square {
+  border: 3px solid black;
+  width: 10vw;
+  height: 10vw;
+  margin-top: 2vw;
+  margin-left: 2vw;
+  transition: transform 1s linear;
+}
+/* 点击后就会移动过去，结束状态 */
+#app3 .square.active {
+  transform: translateX(15vw);
+}
+
+/* 默认样式 */
+#app4 .circle {
+  border: 1px solid black;
+  width: 10vw;
+  height: 10vw;
+  border-radius: 50%;
+  margin-top: 5vw;
+  margin-left: 5vw;
+}
+
+/* 声明一个动画 */
+@keyframes color {
+  0% {
+    background-color: rgb(67, 7, 206);
+  }
+  100% {
+    background-color: rgb(216, 9, 9);
+  }
+}
+
+/* 把动画加到新加的class：active上 */
+#app4 .circle.active {
+  animation: color 1s linear infinite alternate;
+}
+
+
+/*# sourceMappingURL=/main.1f19ae8e.css.map */
