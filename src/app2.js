@@ -1,6 +1,16 @@
 import "./app2.css";
 import $ from "jquery";
-
+const app2Html = `<section id="app2">
+        <ol class="tab-bar">
+          <li>1</li>
+          <li>2</li>
+        </ol>
+        <ol class="tab-content">
+          <li>你好</li>
+          <li>美女</li>
+        </ol>
+      </section>`;
+$(app2Html).appendTo($("body>.page"));
 //监听两个按钮1和2的点击事件
 //1.先获取要用的元素：两个按钮的爸爸和两个内容的爸爸
 const $tabBar = $("#app2 .tab-bar");

@@ -1,6 +1,20 @@
-import "./app1.css";
-import $ from "jquery";
+import "./app1.css"; //引入css
+import $ from "jquery"; //引入jquery
 
+const app1Html = `        
+<section id="app1">
+  <div class="output">
+    <span id="number">100</span>
+  </div>
+  <div class="actions">
+    <button id="add">+1</button>
+    <button id="minus">-1</button>
+    <button id="mul">×2</button>
+    <button id="divide">÷2</button>
+  </div>
+</section>
+`;
+$(app1Html).appendTo($("body>.page")); //引入html
 //监听按钮们
 //当用户刷新，数字不会改变：每次更新都把数字也更新存到localStorage里
 //1.先获取到按钮们和包住数字的span元素

@@ -11020,9 +11020,14 @@ var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+//引入css
+//引入jquery
+var app1Html = "        \n<section id=\"app1\">\n  <div class=\"output\">\n    <span id=\"number\">100</span>\n  </div>\n  <div class=\"actions\">\n    <button id=\"add\">+1</button>\n    <button id=\"minus\">-1</button>\n    <button id=\"mul\">\xD72</button>\n    <button id=\"divide\">\xF72</button>\n  </div>\n</section>\n";
+(0, _jquery.default)(app1Html).appendTo((0, _jquery.default)("body>.page")); //引入html
 //监听按钮们
 //当用户刷新，数字不会改变：每次更新都把数字也更新存到localStorage里
 //1.先获取到按钮们和包住数字的span元素
+
 var $button1 = (0, _jquery.default)("#add");
 var $button2 = (0, _jquery.default)("#minus");
 var $button3 = (0, _jquery.default)("#mul");
@@ -11075,8 +11080,10 @@ var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-//监听两个按钮1和2的点击事件
+var app2Html = "<section id=\"app2\">\n        <ol class=\"tab-bar\">\n          <li>1</li>\n          <li>2</li>\n        </ol>\n        <ol class=\"tab-content\">\n          <li>\u4F60\u597D</li>\n          <li>\u7F8E\u5973</li>\n        </ol>\n      </section>";
+(0, _jquery.default)(app2Html).appendTo((0, _jquery.default)("body>.page")); //监听两个按钮1和2的点击事件
 //1.先获取要用的元素：两个按钮的爸爸和两个内容的爸爸
+
 var $tabBar = (0, _jquery.default)("#app2 .tab-bar");
 var $tabContent = (0, _jquery.default)("#app2 .tab-content"); //2.监听父元素$tabBar，从而监听子元素li们(这样就不用监听两个li了)的点击事件，执行函数
 
@@ -11111,7 +11118,9 @@ var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-//1、获得方块
+var app3Html = "\n      <section id=\"app3\"><div class=\"square\"></div></section>\n";
+(0, _jquery.default)(app3Html).appendTo((0, _jquery.default)("body>.page")); //1、获得方块
+
 var $square = (0, _jquery.default)("#app3 .square"); //2、设置初始方块的位置
 //如果储存的是yes，那么说明刷新前有class，那么说明active为true，初始化时就给他再加上class，不然会回去；
 //如果储存的no、undefined，那么说刷新前没有class，那么说明active为false，初始化时就给他再删去class，仍然在原地不动
@@ -11147,6 +11156,8 @@ var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var app4Html = "\n      <section id=\"app4\"><div class=\"circle\"></div></section>\n";
+(0, _jquery.default)(app4Html).appendTo((0, _jquery.default)("body>.page"));
 var $circle = (0, _jquery.default)("#app4 .circle"); //2、监听圆，的当鼠标浮上去事件-就加上class，的鼠标移走事件-删除class（class里有动画）
 
 $circle.on("mouseenter", function () {
@@ -11168,6 +11179,9 @@ require("./app2.js");
 require("./app3.js");
 
 require("./app4.js");
+
+// 整体布局的css样式
+document.querySelector("#img").remove();
 },{"./reset.css":"reset.css","./global.css":"global.css","./app1.js":"app1.js","./app2.js":"app2.js","./app3.js":"app3.js","./app4.js":"app4.js"}],"../../../AppData/Local/Yarn/Data/global/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
