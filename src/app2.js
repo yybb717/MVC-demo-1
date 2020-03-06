@@ -17,6 +17,8 @@ $tabBar.on("click", "li", e => {
   //（3）做内容切换
   // ① 点击的li元素排第几个
   const index = $li.index();
+  //要把index储存下来
+  localStorage.setItem("app2.index", index);
   // ② 那内容里的那个li元素也是排老几，把它变成出现，他的兄弟变成消失
   // ③ 找出内容li元素，的第index个，给他加上class：action(css里应该是出现)，给他的兄弟去掉class：action
   $tabContent
@@ -27,9 +29,9 @@ $tabBar.on("click", "li", e => {
     .removeClass("actions");
 });
 
-//刚开始进入这个页面，我想就是显示点击了按钮一出现按钮一的内容
-//那让js自己先点击
+//我想在刷新后还是上次点击的按钮，那就要储存。把每次点好后的index储存，下一次刷新页面后让js自己点击第index个就行
+const index = localStorage.getItem("app2.index") || 0;
 $tabBar
   .children()
-  .eq(0)
+  .eq(index)
   .trigger("click");

@@ -11087,14 +11087,16 @@ $tabBar.on("click", "li", function (e) {
   $li.addClass("selected").siblings().removeClass("selected"); //（3）做内容切换
   // ① 点击的li元素排第几个
 
-  var index = $li.index(); // ② 那内容里的那个li元素也是排老几，把它变成出现，他的兄弟变成消失
+  var index = $li.index(); //要把index储存下来
+
+  localStorage.setItem("app2.index", index); // ② 那内容里的那个li元素也是排老几，把它变成出现，他的兄弟变成消失
   // ③ 找出内容li元素，的第index个，给他加上class：action(css里应该是出现)，给他的兄弟去掉class：action
 
   $tabContent.children().eq(index).addClass("actions").siblings().removeClass("actions");
-}); //刚开始进入这个页面，我想就是显示点击了按钮一出现按钮一的内容
-//那让js自己先点击
+}); //我想在刷新后还是上次点击的按钮，那就要储存。把每次点好后的index储存，下一次刷新页面后让js自己点击第index个就行
 
-$tabBar.children().eq(0).trigger("click");
+var index = localStorage.getItem("app2.index") || 0;
+$tabBar.children().eq(index).trigger("click");
 },{"./app2.css":"app2.css","jquery":"../node_modules/jquery/dist/jquery.js"}],"app3.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
@@ -11109,13 +11111,27 @@ var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-//监听方块的点击事件
 //1、获得方块
-var $square = (0, _jquery.default)("#app3 .square"); //2、监听方块，当点击后，有class就删掉，没有class就加上
+var $square = (0, _jquery.default)("#app3 .square"); //2、设置初始方块的位置
+//如果储存的是yes，那么说明刷新前有class，那么说明active为true，初始化时就给他再加上class，不然会回去；
+//如果储存的no、undefined，那么说刷新前没有class，那么说明active为false，初始化时就给他再删去class，仍然在原地不动
+
+var active = localStorage.getItem("app3.active") === "yes"; // if (active) {
+//   $square.addClass("active");
+// } else {
+//   $square.removeClass("active");
+// }  这五行等价于下面这一行
+
+$square.toggleClass("active", active); //3、监听方块，当点击后，有class就删掉，没有class就加上
 
 $square.on("click", function () {
-  //$square.addClass("active");点击后就会移动过去
-  $square.toggleClass("active");
+  if ($square.hasClass("active")) {
+    localStorage.setItem("app3.active", "no");
+    $square.removeClass("active");
+  } else {
+    $square.addClass("active");
+    localStorage.setItem("app3.active", "yes");
+  }
 });
 },{"./app3.css":"app3.css","jquery":"../node_modules/jquery/dist/jquery.js"}],"app4.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
@@ -11180,7 +11196,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55936" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62366" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
