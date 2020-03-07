@@ -11014,58 +11014,119 @@ return jQuery;
 },{"process":"../../../AppData/Local/Yarn/Data/global/node_modules/process/browser.js"}],"app1.js":[function(require,module,exports) {
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
 require("./app1.css");
 
 var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-//引入css
-//引入jquery
-var app1Html = "        \n<section id=\"app1\">\n  <div class=\"output\">\n    <span id=\"number\">100</span>\n  </div>\n  <div class=\"actions\">\n    <button id=\"add\">+1</button>\n    <button id=\"minus\">-1</button>\n    <button id=\"mul\">\xD72</button>\n    <button id=\"divide\">\xF72</button>\n  </div>\n</section>\n";
-(0, _jquery.default)(app1Html).appendTo((0, _jquery.default)("body>.page")); //引入html
-//监听按钮们
-//当用户刷新，数字不会改变：每次更新都把数字也更新存到localStorage里
-//1.先获取到按钮们和包住数字的span元素
+var eventBus = (0, _jquery.default)(window); //这个dom元素也叫事件公交车，有个on和trigger属性，可以监听和触发任何事件，这样就可以对象间通信了
+// 一、数据相关都放到m
 
-var $button1 = (0, _jquery.default)("#add");
-var $button2 = (0, _jquery.default)("#minus");
-var $button3 = (0, _jquery.default)("#mul");
-var $button4 = (0, _jquery.default)("#divide");
-var $number = (0, _jquery.default)("#number"); //2.初始化数字（span里的内容）：如果储存有就是储存里的那个num的值，储存里没有就是100
+var m = {
+  //1.有个数据本数
+  data: {
+    n: parseInt(localStorage.getItem("n"))
+  },
+  //2.可以对数据增删改查
+  create: function create() {},
+  delete: function _delete() {},
+  //本模块只需要对数据修改。update函数①把老数据替换成参数变成新数据，②触发eventBus的m：updated事件，③把新数据储存
+  update: function update(data) {
+    Object.assign(m.data, data);
+    eventBus.trigger("m:updated");
+    localStorage.setItem("n", m.data.n);
+  },
+  get: function get() {}
+}; // 二、视图相关都放到v
 
-var n = localStorage.getItem("num");
-$number.text(n || 100); //3.监听加号按钮的点击事件，执行函数
+var v = {
+  //1、一个空容器，以后就是装html的容器
+  el: null,
+  //2、要添加的html
+  html: "<div>\n    <div class=\"output\">\n      <span id=\"number\">{{n}}</span>\n    </div>\n    <div class=\"actions\">\n      <button id=\"add1\">+1</button>\n      <button id=\"minus1\">-1</button>\n      <button id=\"mul2\">*2</button>\n      <button id=\"divide2\">\xF72</button>\n    </div>\n  </div>\n",
+  //3、初始化容器函数，参数是我们给的要当容器的元素（应该是index.html里就有的元素）
+  init: function init(container) {
+    v.el = (0, _jquery.default)(container);
+  },
+  //4、渲染函数，参数将是数据。也就是视图全都是对数据渲染 view = render(data)
+  render: function render(x) {
+    if (v.el.children.length !== 0) v.el.empty(); //如果容器里有东西，就全删掉
 
-$button1.on("click", function () {
-  var n = parseInt($number.text()); //获取数字:span元素里的内容是个数字字符串，要转化成数字，命名为n
+    (0, _jquery.default)(v.html.replace("{{n}}", x)).appendTo(v.el); //把html里的占位符替换成x，再加入容器中
+  }
+}; // 三、其他都c
 
-  n += 1;
-  localStorage.setItem("num", n); //n每次变化好后都要更新储存里的num
+var c = {
+  //1.总初始化函数，参数是我们给的要当容器的元素
+  init: function init(container) {
+    v.init(container); //①首先初始化容器
 
-  $number.text(n); //把加好的数字重新成为span元素的内容
-}); //4.监听减号按钮的点击事件，执行函数
+    v.render(m.data.n); // ②把html里的占位符替换成数据，然后全部渲染出来。view = render(data)
 
-$button2.on("click", function () {
-  var n = parseInt($number.text());
-  n -= 1;
-  localStorage.setItem("num", n);
-  $number.text(n);
-}); //5.监听乘号按钮的点击事件，执行函数
+    c.autoBindEvents(); //③执行自动绑定函数
 
-$button3.on("click", function () {
-  var n = parseInt($number.text());
-  n *= 2;
-  localStorage.setItem("num", n);
-  $number.text(n);
-}); //6.监听除号按钮的点击事件，执行函数
+    eventBus.on("m:updated", function () {
+      //④监听m:updated事件，每次触发就重新用新数据渲染一遍
+      console.log("here");
+      v.render(m.data.n);
+    });
+  },
+  //2、自动绑定事件
+  //(1)把所有事件写成哈希表
+  events: {
+    "click #add1": "add",
+    "click #minus1": "minus",
+    "click #mul2": "mul",
+    "click #divide2": "div"
+  },
+  //(2)每个事件要执行的函数写出来
+  add: function add() {
+    m.update({
+      n: m.data.n + 1
+    }); //每次点击就做数据的修改函数
+  },
+  minus: function minus() {
+    m.update({
+      n: m.data.n - 1
+    });
+  },
+  mul: function mul() {
+    m.update({
+      n: m.data.n * 2
+    });
+  },
+  div: function div() {
+    m.update({
+      n: m.data.n / 2
+    });
+  },
+  //(3)自动绑定事件
+  autoBindEvents: function autoBindEvents() {
+    for (var key in c.events) {
+      //对事件哈希表里每一个事件
+      var value = c[c.events[key]]; //要执行的函数  如add
 
-$button4.on("click", function () {
-  var n = parseInt($number.text());
-  n /= 2;
-  localStorage.setItem("num", n);
-  $number.text(n);
-});
+      var spaceIndex = key.indexOf(" ");
+      var part1 = key.slice(0, spaceIndex); //事件名part1  如click
+
+      var part2 = key.slice(spaceIndex + 1); //实际监听元素part2   如#add1元素
+
+      v.el.on(part1, part2, value); //用事件委托，监听容器元素的part1事件，其实是监听他的子元素part2的part1事件，执行函数。
+      //这里是用容器元素的子元素的id来选出子元素然后绑定事件给这些子元素，每次渲染子元素的id不会变的。所以用子元素id选出子元素在绑定事件，一劳永逸！
+    }
+  }
+}; //必须把总初始化函数导出来使用，所以把整个c导出来。在main.js里使用总初始化函数。
+
+var _default = c; //监听m-updated事件，对数据修改的同时还会触发该事件，触发了就用新数据再渲染一次html
+//思考过程看ipad笔记
+
+exports.default = _default;
 },{"./app1.css":"app1.css","jquery":"../node_modules/jquery/dist/jquery.js"}],"app2.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
@@ -11085,7 +11146,7 @@ var app2Html = "<section id=\"app2\">\n        <ol class=\"tab-bar\">\n         
 //1.先获取要用的元素：两个按钮的爸爸和两个内容的爸爸
 
 var $tabBar = (0, _jquery.default)("#app2 .tab-bar");
-var $tabContent = (0, _jquery.default)("#app2 .tab-content"); //2.监听父元素$tabBar，从而监听子元素li们(这样就不用监听两个li了)的点击事件，执行函数
+var $tabContent = (0, _jquery.default)("#app2 .tab-content"); //2.监听父元素$tabBar，从而监听子元素li们(这样就不用监听两个li了)的点击事件，执行函数--事件委托
 
 $tabBar.on("click", "li", function (e) {
   //（1）那问题来了，到底是哪个子元素li的点击事件？
@@ -11172,7 +11233,7 @@ require("./reset.css");
 
 require("./global.css");
 
-require("./app1.js");
+var _app = _interopRequireDefault(require("./app1.js"));
 
 require("./app2.js");
 
@@ -11180,8 +11241,10 @@ require("./app3.js");
 
 require("./app4.js");
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 // 整体布局的css样式
-document.querySelector("#img").remove();
+_app.default.init("#app1");
 },{"./reset.css":"reset.css","./global.css":"global.css","./app1.js":"app1.js","./app2.js":"app2.js","./app3.js":"app3.js","./app4.js":"app4.js"}],"../../../AppData/Local/Yarn/Data/global/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -11210,7 +11273,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62366" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63782" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

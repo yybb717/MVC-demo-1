@@ -15,7 +15,7 @@ $(app2Html).appendTo($("body>.page"));
 //1.先获取要用的元素：两个按钮的爸爸和两个内容的爸爸
 const $tabBar = $("#app2 .tab-bar");
 const $tabContent = $("#app2 .tab-content");
-//2.监听父元素$tabBar，从而监听子元素li们(这样就不用监听两个li了)的点击事件，执行函数
+//2.监听父元素$tabBar，从而监听子元素li们(这样就不用监听两个li了)的点击事件，执行函数--事件委托
 $tabBar.on("click", "li", e => {
   //（1）那问题来了，到底是哪个子元素li的点击事件？
   const $li = $(e.currentTarget);
