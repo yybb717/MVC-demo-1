@@ -11025,7 +11025,7 @@ var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var eventBus = (0, _jquery.default)(window); //这个dom元素也叫事件公交车，有个on和trigger属性，可以监听和触发任何事件，这样就可以对象间通信了
+var eventBus = (0, _jquery.default)(window); //这个dom元素也，有个on和trigger属性，可以监听和触发任何事件，这样就可以对象间通信了
 // 一、数据相关都放到m
 
 var m = {
@@ -11135,36 +11135,97 @@ module.hot.accept(reloadCSS);
 },{"_css_loader":"../../../AppData/Local/Yarn/Data/global/node_modules/parcel/src/builtins/css-loader.js"}],"app2.js":[function(require,module,exports) {
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
 require("./app2.css");
 
 var _jquery = _interopRequireDefault(require("jquery"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var app2Html = "<section id=\"app2\">\n        <ol class=\"tab-bar\">\n          <li>1</li>\n          <li>2</li>\n        </ol>\n        <ol class=\"tab-content\">\n          <li>\u4F60\u597D</li>\n          <li>\u7F8E\u5973</li>\n        </ol>\n      </section>";
-(0, _jquery.default)(app2Html).appendTo((0, _jquery.default)("body>.page")); //监听两个按钮1和2的点击事件
-//1.先获取要用的元素：两个按钮的爸爸和两个内容的爸爸
+var eventBus = (0, _jquery.default)(window);
+var localKey = "app2.index"; // 一、数据相关都放到m
 
-var $tabBar = (0, _jquery.default)("#app2 .tab-bar");
-var $tabContent = (0, _jquery.default)("#app2 .tab-content"); //2.监听父元素$tabBar，从而监听子元素li们(这样就不用监听两个li了)的点击事件，执行函数--事件委托
+var m = {
+  //1.有个数据本数
+  data: {
+    index: parseInt(localStorage.getItem(localKey)) || 0
+  },
+  //2.可以对数据增删改查
+  create: function create() {},
+  delete: function _delete() {},
+  //本模块只需要对数据修改。update函数①把老数据替换成参数变成新数据，②触发eventBus的m：updated事件，③把新数据储存
+  update: function update(data) {
+    Object.assign(m.data, data);
+    eventBus.trigger("m:updated");
+    localStorage.setItem("index", m.data.index);
+  },
+  get: function get() {}
+}; // 二、视图相关都放到v
 
-$tabBar.on("click", "li", function (e) {
-  //（1）那问题来了，到底是哪个子元素li的点击事件？
-  var $li = (0, _jquery.default)(e.currentTarget); //（2）做背景色切换:点击的那个li加上class：selected，就会有背景色了；他的兄弟删去class，就没有背景色了
+var v = {
+  //1、一个空容器，以后就是装html的容器
+  el: null,
+  //2、要添加的html（对数据渲染，所以想想如何在html里利用数据）
+  //这个html是个函数，必须把数据给它当参数，把字符串里的东西替换了，然后他才会返回html字符串
+  //如果数据（下标、参数）是0，那就说明点到第一个按钮，给第一个按钮和第一个内容加class，
+  //如果数据（下标、参数）是1，那就说明点到第二个按钮，给第一个按钮和第二个内容加class
+  //用data-*做标记方法，把li的下标记下来出来。
+  html: function html(index) {
+    return "\n    <div>\n      <ol class=\"tab-bar\">\n        <li class=\"".concat(index === 0 ? "selected" : "", "\" data-index=\"0\"><span>1111</span></li>\n        <li class=\"").concat(index === 1 ? "selected" : "", "\" data-index=\"1\"><span>2222</span></li>\n      </ol>\n      <ol class=\"tab-content\">\n        <li class=\"").concat(index === 0 ? "active" : "", "\">\u5185\u5BB91</li>\n        <li class=\"").concat(index === 1 ? "active" : "", "\">\u5185\u5BB92</li>\n      </ol>\n    </div>\n");
+  },
+  //3、初始化容器函数，参数是我们给的要当容器的元素（应该是index.html里就有的元素）
+  init: function init(container) {
+    v.el = (0, _jquery.default)(container);
+  },
+  //4、渲染函数，参数将是数据。也就是视图全都是对数据渲染 view = render(data)
+  render: function render(index) {
+    if (v.el.children.length !== 0) v.el.empty();
+    (0, _jquery.default)(v.html(index)).appendTo(v.el);
+  }
+}; // 三、其他都c
 
-  $li.addClass("selected").siblings().removeClass("selected"); //（3）做内容切换
-  // ① 点击的li元素排第几个
+var c = {
+  //1.总初始化函数，参数是我们给的要当容器的元素
+  init: function init(container) {
+    v.init(container);
+    v.render(m.data.index); // view = render(data)
 
-  var index = $li.index(); //要把index储存下来
+    c.autoBindEvents();
+    eventBus.on("m:updated", function () {
+      v.render(m.data.index);
+    });
+  },
+  //2、自动绑定事件
+  //(1)把所有事件写成哈希表
+  events: {
+    "click .tab-bar li": "x"
+  },
+  //(2)每个事件要执行的函数写出来
+  //每次点击那个li，取出我们在html里加好的他的data-index，这样我们就知道下标了，也就是数据。用dataset.index取出来！
+  x: function x(e) {
+    var index = parseInt(e.currentTarget.dataset.index);
+    m.update({
+      index: index
+    });
+  },
+  //(3)自动绑定事件
+  autoBindEvents: function autoBindEvents() {
+    for (var key in c.events) {
+      var value = c[c.events[key]];
+      var spaceIndex = key.indexOf(" ");
+      var part1 = key.slice(0, spaceIndex);
+      var part2 = key.slice(spaceIndex + 1);
+      v.el.on(part1, part2, value);
+    }
+  }
+}; //必须把总初始化函数导出来使用，所以把整个c导出来。在main.js里使用总初始化函数。
 
-  localStorage.setItem("app2.index", index); // ② 那内容里的那个li元素也是排老几，把它变成出现，他的兄弟变成消失
-  // ③ 找出内容li元素，的第index个，给他加上class：action(css里应该是出现)，给他的兄弟去掉class：action
-
-  $tabContent.children().eq(index).addClass("actions").siblings().removeClass("actions");
-}); //我想在刷新后还是上次点击的按钮，那就要储存。把每次点好后的index储存，下一次刷新页面后让js自己点击第index个就行
-
-var index = localStorage.getItem("app2.index") || 0;
-$tabBar.children().eq(index).trigger("click");
+var _default = c;
+exports.default = _default;
 },{"./app2.css":"app2.css","jquery":"../node_modules/jquery/dist/jquery.js"}],"app3.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
@@ -11235,7 +11296,7 @@ require("./global.css");
 
 var _app = _interopRequireDefault(require("./app1.js"));
 
-require("./app2.js");
+var _app2 = _interopRequireDefault(require("./app2.js"));
 
 require("./app3.js");
 
@@ -11245,6 +11306,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // 整体布局的css样式
 _app.default.init("#app1");
+
+_app2.default.init("#app2");
 },{"./reset.css":"reset.css","./global.css":"global.css","./app1.js":"app1.js","./app2.js":"app2.js","./app3.js":"app3.js","./app4.js":"app4.js"}],"../../../AppData/Local/Yarn/Data/global/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -11273,7 +11336,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63782" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51365" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

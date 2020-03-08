@@ -1,7 +1,8 @@
 import "./app1.css";
 import $ from "jquery";
 
-const eventBus = $(window); //这个dom元素也叫事件公交车，有个on和trigger属性，可以监听和触发任何事件，这样就可以对象间通信了
+const eventBus = $(window);
+//这个dom元素也，有个on和trigger属性，可以监听和触发任何事件，这样就可以对象间通信了
 // 一、数据相关都放到m
 const m = {
   //1.有个数据本数

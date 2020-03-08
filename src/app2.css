@@ -17,6 +17,6 @@
 #app2 .tab-content > li {
   display: none;
 }
-#app2 .tab-content > li.actions {
+#app2 .tab-content > li.active {
   display: block;
 }
